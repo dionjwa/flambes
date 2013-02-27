@@ -1,0 +1,3 @@
+[submodule "lib/hxods"]
+	path = lib/hxods
+	url = git://github.com/ncannasse/hxods.git

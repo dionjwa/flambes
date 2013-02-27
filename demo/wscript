@@ -16,8 +16,8 @@ def build(ctx):
 	
 	classpaths = []
 	
-	# for p in ["../src", "../lib/hxods"]:
-	#     classpaths.append(ctx.path.find_dir(p))
+	for p in ["../lib/hxods"]:
+	    classpaths.append(ctx.path.find_dir(p))
 	    
 	shutil.rmtree("build/assets", True)
 	shutil.copytree("assets", "build/assets")
@@ -27,8 +27,8 @@ def build(ctx):
 	    # name="Server", 
 		npm_libs="connect commander",
 		main="flambe.demo.assetserver.Server",
-		# classpath=classpaths,
-		libs="flambes remoting nodejs nodejs_externs node-std hxods macro-tools",
+		classpath=classpaths,
+		libs="flambes remoting nodejs nodejs_externs node-std macro-tools",
 		# target="server.js"
 		flags="-D flambe_keep_logs -D enable_flambe_reloading",
 		)
@@ -38,9 +38,9 @@ def build(ctx):
 		# name="client",
 		platforms=["html"],#, "flash"
 		main="flambe.demo.assetserver.Client",
-		# classpath=classpaths,
+		classpath=classpaths,
 		# dead_code_elimination=False,
-		libs="html5 remoting hxods flambes macro-tools",
+		libs="html5 remoting flambes macro-tools",
 		# target="client.js",
 		flags="-D flambe_keep_logs -D enable_flambe_reloading", # --no-opt --no-inline --js-modern
 		)

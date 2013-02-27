@@ -12,11 +12,12 @@
 -lib flambe
 -lib remoting
 -lib nodejs_externs
--lib hxods
+# -lib hxods
 -lib flambes
 -lib format:1.24
 -lib macro-tools
 
+-cp ../lib/hxods
 -cp demo/src
 
 -main flambe.demo.assetserver.Server
