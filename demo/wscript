@@ -1,0 +1,47 @@
+#!/usr/bin/env python
+
+import shutil
+
+# Setup options for display when running waf --help
+def options(ctx):
+	ctx.load("flambe")
+
+# Setup configuration when running waf configure
+def configure(ctx):
+	ctx.load("flambe")
+
+# Runs the build!
+def build(ctx):
+	if ctx.env.debug: print("This is a debug build!")
+	
+	classpaths = []
+	
+	# for p in ["../src", "../lib/hxods"]:
+	#     classpaths.append(ctx.path.find_dir(p))
+	    
+	shutil.rmtree("build/assets", True)
+	shutil.copytree("assets", "build/assets")
+		
+	# Kick off a build with the desired platforms
+	ctx(features="flambe-server",
+	    # name="Server", 
+		npm_libs="connect commander",
+		main="flambe.demo.assetserver.Server",
+		# classpath=classpaths,
+		libs="flambes remoting nodejs nodejs_externs node-std hxods macro-tools",
+		# target="server.js"
+		flags="-D flambe_keep_logs -D enable_flambe_reloading",
+		)
+		
+	ctx(#name="remoting-client", 
+		features="flambe",
+		# name="client",
+		platforms=["html"],#, "flash"
+		main="flambe.demo.assetserver.Client",
+		# classpath=classpaths,
+		# dead_code_elimination=False,
+		libs="html5 remoting hxods flambes macro-tools",
+		# target="client.js",
+		flags="-D flambe_keep_logs -D enable_flambe_reloading", # --no-opt --no-inline --js-modern
+		)
+		

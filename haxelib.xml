@@ -1,0 +1,11 @@
+<project name="flambes" url="https://github.com/dionjwa/flambes" license="BSD">
+        <user name="dionjwa"/>
+        <description>Asset server+reloader for flambe</description>
+        <version name="0.1">Initial import</version>
+        <tag v="flambe"/>
+        <tag v="node.js"/>
+        <tag v="nodejs"/>
+        <tag v="js"/>
+        <depends name="flambe" />
+        <depends name="macro-tools" />
+</project>
