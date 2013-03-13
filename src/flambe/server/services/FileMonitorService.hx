@@ -11,10 +11,19 @@ import js.Node;
 class FileMonitorService
 {
 	public var fileChangedSignal (default, null):Signal1<String>;
+	#if haxe3
+	var _watchedFiles :Map<String, NodeFSWatcher>;
+	#else
 	var _watchedFiles :Hash<NodeFSWatcher>;
+	#end
 	public function new ()
 	{
+		#if haxe3
+		_watchedFiles = new Map();
+		#else
 		_watchedFiles = new Hash();
+		#end
+		
 		fileChangedSignal = new Signal1();
 	}
 
@@ -75,7 +84,11 @@ class FileMonitorService
 		for(f in _watchedFiles) {
 			f.close();
 		}
+		#if haxe3
+		_watchedFiles = new Map();
+		#else
 		_watchedFiles = new Hash();
+		#end
 		cb(true);
 	}
 	

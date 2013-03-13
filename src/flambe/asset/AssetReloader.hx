@@ -1,5 +1,11 @@
 package flambe.asset;
 
+#if haxe3
+import js.Browser;
+#else
+typedef Browser=js.Lib;
+#end
+
 import flambe.platform.BasicAssetPackLoader;
 
 import flambe.server.assets.messages.AssetUpdated;
@@ -17,7 +23,7 @@ class AssetReloader
 {
 	public static var odsSignal :Signal2<String, Array<Dynamic>> = new Signal2<String, Array<Dynamic>>();
 	
-	public static function setupAssetReloading (loadEntry :AssetEntry->Void, manifest :Manifest) :Void
+	public static function setupAssetReloading (loadEntry :String->AssetEntry->Void, manifest :Manifest) :Void
 	{
 		haxe.Serializer.USE_ENUM_INDEX=true;
 		
@@ -25,8 +31,8 @@ class AssetReloader
 			odsSignal = new Signal2<String, Array<Dynamic>>();
 		}
 		
-		var wsport :Int = Std.int(js.Lib.window.location.port) + 1;
-		var websocketUrl = "ws://" + js.Lib.window.location.hostname + ":" + wsport;
+		var wsport :Int = Std.parseInt(Browser.window.location.port) + 1;
+		var websocketUrl = "ws://" + Browser.window.location.hostname + ":" + wsport;
 		Log.info('Websocket URL=' + websocketUrl);
 		
 		var websocketClient = new transition9.websockets.WebsocketClient(websocketUrl);
@@ -39,7 +45,7 @@ class AssetReloader
 			for (entry in manifest) {
 				if (entry.name == msg.asset.name) {
 					Log.info("Reloading asset entry:", ["updatedAssetEntry", msg.asset]);
-					loadEntry(msg.asset);
+					loadEntry(msg.asset.url, msg.asset);
 					foundEntry = true;
 					break;
 				}

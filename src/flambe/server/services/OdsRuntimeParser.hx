@@ -1,6 +1,6 @@
 package flambe.server.services;
 
-import js.sys.io.File;
+import sys.io.File;
 import haxe.io.StringInput;
 
 import ods.Ods;
@@ -39,9 +39,17 @@ class OdsRuntimeParser
 	}
 	
 	//Returns a hash (sheet indexed) of an array of Json objects
+	#if haxe3
+	public static function parse <T>(filePath :String) :Map<String, Array<T>>
+	#else
 	public static function parse <T>(filePath :String) :Hash<Array<T>>
+	#end
 	{
+		#if haxe3
+		var sheets = new Map<String, Array<T>>();
+		#else
 		var sheets = new Hash<Array<T>>();
+		#end
 		var ods = new OdsChecker();
 		ods.loadODS(new StringInput(File.getContent(filePath)));
 		

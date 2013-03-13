@@ -19,7 +19,7 @@ def build(ctx):
 		features="flambe-server",
 		npm_libs="commander websocket",
 		main="flambe.server.assets.AssetServer",
-		libs="flambe nodejs nodejs_externs remoting node-std hxods macro-tools",
+		libs="flambe nodejs nodejs_externs remoting nodejs-std macro-tools",
 		target="assetserver.js")
 	
 	# shutil.copy("build/assetserver-server/assetserver.js", "./assetserver.js")

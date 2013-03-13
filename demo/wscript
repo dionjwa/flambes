@@ -23,21 +23,23 @@ def build(ctx):
 	shutil.copytree("assets", "build/assets")
 		
 	# Kick off a build with the desired platforms
-	ctx(features="flambe-server",
-	    # name="Server", 
-		npm_libs="connect commander",
-		main="flambe.demo.assetserver.Server",
-		classpath=classpaths,
-		libs="flambes remoting nodejs nodejs_externs node-std macro-tools",
-		# target="server.js"
-		flags="-D flambe_keep_logs -D enable_flambe_reloading",
-		)
+	# ctx(features="flambe-server",
+	#     # name="Server", 
+	# 	npm_libs="connect commander",
+	# 	main="flambe.demo.assetserver.Server",
+	# 	classpath=classpaths,
+	# 	dead_code_elimination=False,
+	# 	libs="flambes remoting nodejs_externs nodejs_std macro-tools",
+	# 	# target="server.js"
+	# 	flags="-D flambe_keep_logs -D enable_flambe_reloading --remap sys:sys",
+	# 	)
 		
 	ctx(#name="remoting-client", 
 		features="flambe",
 		# name="client",
 		platforms=["html"],#, "flash"
 		main="flambe.demo.assetserver.Client",
+		dead_code_elimination=False,
 		classpath=classpaths,
 		# dead_code_elimination=False,
 		libs="html5 remoting flambes macro-tools",

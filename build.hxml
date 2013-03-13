@@ -1,48 +1,44 @@
- #Server
--debug
--D server
--D flambe_keep_logs
--D enable_flambe_reloading
---no-opt
---no-inline
---js-modern
+#  #Server
+# -debug
+# -D server
+# -D nodejs
+# -D flambe_keep_logs
+# -D enable_flambe_reloading
+# --no-opt
 
--lib nodejs
--lib node-std
--lib flambe
--lib remoting
--lib nodejs_externs
-# -lib hxods
--lib flambes
--lib format:1.24
--lib macro-tools
+# -lib flambe
+# -lib flambes
+# -lib nodejs_std
+# -lib nodejs_externs
+# -lib remoting
+# -lib format
+# -lib macro-tools
 
--cp ../lib/hxods
--cp demo/src
+# -cp lib/hxods
+# -cp demo/src
 
--main flambe.demo.assetserver.Server
--js demo/deploy/main-server/server.js
+# -main flambe.demo.assetserver.Server
+
+# -js demo/deploy/main-server/server.js
+# --remap sys:sys
 
 # --next
 
 # #Client
-# -debug
-# -D enable_flambe_reloading
-# -D flambe_keep_logs
+-debug
+-D enable_flambe_reloading
+-D flambe_keep_logs
 # --no-opt
 # --no-inline
 # --js-modern
-# --dead-code-elimination
-# -D html
-# -lib flambe
-# -lib remoting
-# -lib html5
-# -lib format
-# -lib hxods
-# -lib flambes
-# -lib macro-tools
-# # -cp src
-# -cp demo/src
-# # -cp lib/hxods
-# -main flambe.demo.assetserver.Client
-# -js demo/deploy/web/targets/main-html.js
+-D html
+-lib flambe
+-lib remoting
+-lib html5
+-lib format
+-lib flambes
+-lib macro-tools
+-cp demo/src
+-cp lib/hxods
+-main flambe.demo.assetserver.Client
+-js demo/deploy/web/targets/main-html.js

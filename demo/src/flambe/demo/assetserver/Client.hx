@@ -12,6 +12,10 @@ import flambe.script.Script;
 import flambe.script.Repeat;
 import flambe.script.AnimateBy;
 
+#if !haxe3
+typedef Map<Ignored,T>=Hash<T>
+#end
+
 @:build(ods.Data.build("../assets/bootstrap/stuff/test.ods","items","id"))
 enum Item {
 }
@@ -26,30 +30,67 @@ typedef ItemData = {
 
 class Client
 {
+	#if haxe3
+	static var DATA = ods.Data.parse("../assets/bootstrap/stuff/test.ods", "items", ItemData);
+	#else
 	static var DATA = ods.Data.parseODS("../assets/bootstrap/stuff/test.ods", "items", ItemData);
+	#end
 	
 	static var _layer :Entity;
-	static var _sprites :Hash<ImageSprite>;
+	static var _sprites :Map<String, ImageSprite>;
 	
 	private static function main ()
 	{
 		// var c = flambe.platform.Manifests;
 		// var xc = flambe.server.assets.messages.AssetUpdated;
 		System.init();
-		_sprites = new Hash();
+		
+		
+		//Create the remoting Html connection
+		var conn = haxe.remoting.HttpAsyncConnection.urlConnect("http://localhost:8000");
+		
+		//Build and instantiate the proxy class with macros.  
+		//The full path to the server class is given as the first argument, but it is NOT compiled into the client by default
+		var manifestProxy = transition9.remoting.Macros.buildAndInstantiateRemoteProxyClass(flambe.server.assets.ManifestService, conn);
+		
+		//You can use code completion here
+		manifestProxy.getManifest("bootstrap", function (manifest :flambe.asset.Manifest) {
+			// trace('m=' + m);
+			var loader = System.loadAssetPack(manifest);
+		
+			// Add listeners
+			loader.success.connect(onSuccess);
+			loader.error.connect(function (message) {
+				trace("Load error: " + message);
+			});
+			loader.progressChanged.connect(function () {
+				trace("Loading progress... " + loader.progress + " of " + loader.total);
+			});
+			
+		});
+		
+		// manifestProxy.getManifestNames(function (names :Array<String>) {
+		// 	trace('names=' + names);
+		// });
+		
+		
+		
+		
+		_sprites = new Map();
 		trace("on init DATA: " + untyped JSON.stringify(DATA));
 		
 		var manifest = Manifest.build("bootstrap");
-		var loader = System.loadAssetPack(manifest);
+		trace('manifest=' + manifest);
+		// var loader = System.loadAssetPack(manifest);
 		
-		// Add listeners
-		loader.success.connect(onSuccess);
-		loader.error.connect(function (message) {
-			trace("Load error: " + message);
-		});
-		loader.progressChanged.connect(function () {
-			trace("Loading progress... " + loader.progress + " of " + loader.total);
-		});
+		// // Add listeners
+		// loader.success.connect(onSuccess);
+		// loader.error.connect(function (message) {
+		// 	trace("Load error: " + message);
+		// });
+		// loader.progressChanged.connect(function () {
+		// 	trace("Loading progress... " + loader.progress + " of " + loader.total);
+		// });
 	}
 	
 	private static function onSuccess (pack :AssetPack)
@@ -71,7 +112,7 @@ class Client
 			System.root.addChild(_layer);
 		}
 		
-		var allIds = new Hash<Bool>();
+		var allIds = new Map<String, Bool>();
 		for (item in DATA) {
 			allIds.set(Type.enumConstructor(item.id), true);
 		}

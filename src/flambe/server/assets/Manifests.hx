@@ -4,15 +4,17 @@ package flambe.server.assets;
 import js.Lib;
 #end
 
-#if macro
 import sys.FileSystem;
+
+#if macro
+
 import sys.io.File;
 
 import haxe.macro.Expr;
 import haxe.macro.Context;
 import haxe.macro.Type;
 #else
-import js.sys.FileSystem;
+// import sys.FileSystem;
 import js.Node;
 #end
 
@@ -25,6 +27,10 @@ using flambe.util.Strings;
 using Lambda;
 using StringTools;
 using Type;
+
+#if !haxe3
+typedef Map<Ignored,T> = Hash<T>
+#end
 
 class Manifests
 {
@@ -44,8 +50,8 @@ class Manifests
 		var bytes = FileSystem.stat(fullPath).size;
 		#elseif nodejs
 		//Assume nodejs
-		url = url + "?v=" + FileSystem.signature(fullPath);
-		var bytes = FileSystem.stat(fullPath).size;
+		url = url + "?v=" + sys.FileSystem.signature(fullPath);
+		var bytes = sys.FileSystem.stat(fullPath).size;
 		#else
 		var url = "";
 		var bytes = 0;
@@ -64,7 +70,7 @@ class Manifests
 		}
 		return FileSystem.exists(dir) && FileSystem.isDirectory(dir) ?
 			FileSystem.readDirectory(dir)
-				.filter(function (file) return (file.fastCodeAt(0) != ".".code && file.endsWith(".cache"))).array()
+				.filter(function (file) return (!(file.fastCodeAt(0) == ".".code || file.endsWith(".cache")))).array()
 				:
 			cast [];
 	}
@@ -114,9 +120,10 @@ class Manifests
 	}
 	#end
 	
-	public static function createManifests (assetPath :String) :Hash<Array<AssetEntry>>
+	public static function createManifests (assetPath :String) :Map<String, Array<AssetEntry>>
 	{
-		var set = new Hash<Array<AssetEntry>>();
+		
+		var set = new Map<String, Array<AssetEntry>>();
 		
 		for (packName in readDirectoryNoHidden(assetPath)) {
 			var entries :Array<AssetEntry> = [];

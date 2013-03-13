@@ -13,17 +13,17 @@ import flambe.server.assets.messages.OdsUpdated;
 
 import transition9.websockets.WebsocketRouter;
 
+import sys.FileSystem;
+
 #if macro
 import haxe.macro.Expr;
-#elseif nodejs
+#elseif (nodejs || nodejs_std)
 import js.Node;
-import js.sys.FileSystem;
 #end
 
 using flambe.util.Strings;
 using StringTools;
 using Lambda;
-using flambe.util.Iterators;
 
 /**
   * Monitors changes in asset files.
@@ -34,14 +34,26 @@ using flambe.util.Iterators;
 class ManifestService extends FileMonitorService
 {
 	var _websockets :WebsocketRouter;
-	var _manifests :Promise<Hash<Array<AssetEntry>>>;
-	var _assets :Hash<AssetBlob>; //Key is the file path, used by the FileService
+	var _assetPath :String;
+	#if haxe3
+		var _manifests :Promise<Map<String, Array<AssetEntry>>>;
+		var _assets :Map<String, AssetBlob>; //Key is the file path, used by the FileService
+	#else
+		var _manifests :Promise<Hash<Array<AssetEntry>>>;
+		var _assets :Hash<AssetBlob>; //Key is the file path, used by the FileService
+	#end
 	
-	public function new (websockets :WebsocketRouter)
+	
+	public function new (websockets :WebsocketRouter, assetPath :String)
 	{
 		super();
 		haxe.Serializer.USE_ENUM_INDEX=true;
-		_assets = new Hash<AssetBlob>();
+		_assetPath = assetPath;
+		#if haxe3
+			_assets = new Map<String, AssetBlob>();
+		#else
+			_assets = new Hash<AssetBlob>();
+		#end
 		_websockets = websockets;
 		fileChangedSignal.connect(onFileChangedSignal);
 		buildManifests();
@@ -50,15 +62,23 @@ class ManifestService extends FileMonitorService
 	@remote
 	public function getManifestNames (cb :Array<String>->Void) :Void
 	{
+		#if haxe3
+		_manifests.get(function(manifests :Map<String, Array<AssetEntry>>) {
+		#else
 		_manifests.get(function(manifests :Hash<Array<AssetEntry>>) {
-			cb(manifests.keys().array());		
+		#end
+			cb({iterator:manifests.keys}.array());		
 		});
 	}
 	
 	@remote
 	public function getManifest (packName :String, cb :flambe.asset.Manifest->Void) :Void
 	{
+		#if haxe3
+		_manifests.get(function(manifests :Map<String, Array<AssetEntry>>) {
+		#else
 		_manifests.get(function(manifests :Hash<Array<AssetEntry>>) {
+		#end
 			var manifest = new Manifest(packName);
 			for (asset in manifests.get(packName)) {
 				manifest.add(asset.name, asset.url, asset.bytes, asset.type);
@@ -68,10 +88,19 @@ class ManifestService extends FileMonitorService
 	}
 	
 	@remote
+	#if haxe3
+	public function getManifests (cb :Map<String, flambe.asset.Manifest>->Void) :Void
+	#else
 	public function getManifests (cb :Hash<flambe.asset.Manifest>->Void) :Void
+	#end
 	{
+		#if haxe3
+		_manifests.get(function(manifests :Map<String, Array<AssetEntry>>) {
+			var result = new Map<String, Manifest>();
+		#else
 		_manifests.get(function(manifests :Hash<Array<AssetEntry>>) {
 			var result = new Hash<Manifest>();
+		#end
 			for (packName in manifests.keys()) {
 				var manifest = new Manifest(packName);
 				result.set(packName, manifest);
@@ -85,14 +114,15 @@ class ManifestService extends FileMonitorService
 	
 	function buildManifests() :Void
 	{
-		unregisterAll(function(ignored :Bool) {});
+		unregisterAll(function(_) {});
 		_manifests = new Promise();
 		//Build manifest, and monitor all the files
-		_assets = new Hash();
+		_assets = new Map();
 		
-		var newManifests = Manifests.createManifests(Manifests.findAssetPath());
+		Log.info("Asset path: " + _assetPath);
+		var newManifests = Manifests.createManifests(_assetPath);
 		
-		trace('newManifests=' + Node.stringify(newManifests));
+		// trace('newManifests=' + Node.stringify(newManifests));
 		
 		for (packName in newManifests.keys()) {
 			for (asset in newManifests.get(packName)) {
@@ -139,7 +169,7 @@ class ManifestService extends FileMonitorService
 			//Copy to the deploy folder
 			var target = FileSystem.join("deploy/web", filePath);
 			Log.warn("Copying ", ["from", filePath, "to", target]);
-			js.sys.io.File.copy(filePath , target);
+			sys.io.File.copy(filePath , target);
 			//Broadcast the changed asset info
 			var update = new AssetUpdated(blob.pack, updatedEntry);
 			Log.warn("update: " + Node.stringify(update));

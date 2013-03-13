@@ -36,6 +36,7 @@ class AssetServer
 	
 	public static function getLocalIp () :String
 	{
+		// trace('Node.os.networkInterfaces()=' + Node.os.networkInterfaces());
 		var en1 :Array<NodeNetworkInterface> = Node.os.networkInterfaces().en1;
 		if (en1 != null) {
 			for (n in en1) {
@@ -44,7 +45,7 @@ class AssetServer
 				}
 			}
 		}
-		return "unknown";
+		return "127.0.0.1";
 	}
 	
 	public static function main () :Void
@@ -69,7 +70,7 @@ class AssetServer
 		var router = createWebsocketRouter(program.port + 1);
 			
 		//Attach the websocket server to the manifest service (also listens to non-socket http requests for haxe remoting)
-		var manifestService = new ManifestService(router);
+		var manifestService = new ManifestService(router, program.assets);
 		
 		//Tell the client which http port to use to download the assets.
 		var serverConfig = new ServerConfig(getLocalIp(), program.port);
@@ -94,5 +95,22 @@ class AssetServer
 			,ConnectStatic.Static(connect, staticFiles)
 		).listen(program.port, '0.0.0.0');
 		
+		
+		// Node.
+		
+		// var spawn = require('child_process').spawn,
+		// 	ls    = spawn('ls', ['-lh', '/usr']);
+		
+		// ls.stdout.on('data', function (data) {
+		//   console.log('stdout: ' + data);
+		// });
+		
+		// ls.stderr.on('data', function (data) {
+		//   console.log('stderr: ' + data);
+		// });
+		
+		// ls.on('exit', function (code) {
+		//   console.log('child process exited with code ' + code);
+		// });
 	}
 }
