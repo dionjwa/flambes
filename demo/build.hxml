@@ -14,12 +14,12 @@
 -lib format
 -lib macro-tools
 
--cp lib/hxods
--cp demo/src
+-cp ../lib/hxods
+-cp src
 
 -main flambe.demo.assetserver.Server
 
--js demo/deploy/main-server/server.js
+-js deploy/main-server/server.js
 --remap sys:sys
 
 # --next

@@ -11,6 +11,8 @@ import flambe.platform.BasicAssetPackLoader;
 import flambe.server.assets.messages.AssetUpdated;
 import flambe.server.assets.messages.OdsUpdated;
 import flambe.server.assets.messages.ServerConfig;
+import flambe.server.assets.messages.ClientReload;
+
 
 import flambe.util.Signal2;
 
@@ -65,5 +67,17 @@ class AssetReloader
 		websocketClient.registerMessageHandler(function(msg :ServerConfig) :Void {
 			Log.info("Received " + Type.getClassName(Type.getClass(msg)) + ": ", ["msg", Std.string(msg)]);
 		});
+		
+		#if html5
+		websocketClient.registerMessageHandler(function(msg :ClientReload) :Void {
+			Log.info("Received " + Type.getClassName(Type.getClass(msg)) + ": ", ["msg", Std.string(msg)]);
+			Log.warn("Reloading");
+			Browser.location.reload();
+		});
+		#end
+		
+		
+		
+		
 	}
 }

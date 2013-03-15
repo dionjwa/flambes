@@ -41,10 +41,7 @@ class Client
 	
 	private static function main ()
 	{
-		// var c = flambe.platform.Manifests;
-		// var xc = flambe.server.assets.messages.AssetUpdated;
 		System.init();
-		
 		
 		//Create the remoting Html connection
 		var conn = haxe.remoting.HttpAsyncConnection.urlConnect("http://localhost:8000");
@@ -69,28 +66,8 @@ class Client
 			
 		});
 		
-		// manifestProxy.getManifestNames(function (names :Array<String>) {
-		// 	trace('names=' + names);
-		// });
-		
-		
-		
-		
 		_sprites = new Map();
 		trace("on init DATA: " + untyped JSON.stringify(DATA));
-		
-		var manifest = Manifest.build("bootstrap");
-		trace('manifest=' + manifest);
-		// var loader = System.loadAssetPack(manifest);
-		
-		// // Add listeners
-		// loader.success.connect(onSuccess);
-		// loader.error.connect(function (message) {
-		// 	trace("Load error: " + message);
-		// });
-		// loader.progressChanged.connect(function () {
-		// 	trace("Loading progress... " + loader.progress + " of " + loader.total);
-		// });
 	}
 	
 	private static function onSuccess (pack :AssetPack)

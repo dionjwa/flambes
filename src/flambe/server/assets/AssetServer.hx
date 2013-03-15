@@ -58,6 +58,8 @@ class AssetServer
 			// .option('-w, --wsport <wsport>', 'specify the websocket port [8001]', untyped Number, 8001)
 			.option('-a, --assets <assets>', 'asset folder, defaults to [./assets]', untyped String, "./assets")
 			.option('-d, --deploy <deploy>', 'deploy folder, defaults to [./deploy/web]', untyped String, "./deploy/web")
+			.option('-s, --src <src1,src2>', 'source folder, defaults to [src]', untyped String, "src")
+			.option('-b, --build <command>', 'build command, e.g. [haxe build.hxml]')//, untyped String, "haxe build.hxml")
 			.parse(Node.process.argv);
   
 		var staticFiles = Node.path.join(Node.process.cwd(), program.deploy);
@@ -95,6 +97,14 @@ class AssetServer
 			,ConnectStatic.Static(connect, staticFiles)
 		).listen(program.port, '0.0.0.0');
 		
+		
+		//Extra niceness: recompile automatically if a *.hx file changes:
+		
+		if (program.build != null) {
+			new RecompilerService(router, program.src.split(","), program.build.split(" "));
+		} else {
+			Log.warn("No RecompilerService");
+		}
 		
 		// Node.
 		
